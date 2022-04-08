@@ -82,8 +82,6 @@ def district_callback(call: CallbackQuery):
         )
     )[0]['name']
 
-    print(selected_district, category_name)
-
     selected_entries[call.from_user.id].append({'name': category_name, 'district': selected_district})
 
     assignment_start(call.from_user.id, call.message.id)
@@ -178,13 +176,13 @@ def assignment_callback(call: CallbackQuery):
 def start(message: Message):
     bot.send_message(
         message.chat.id,
-        'Ну привет. Что бы получить наряд - жми /give_me_NARYAD. Больше ничего я пока не умею.'
+        'Ну привет. Что бы получить наряд - жми /give_me_naryad. Больше ничего я пока не умею.'
     )
     return
 
 
 @check_user()
-@bot.message_handler(commands=['give_me_NARYAD'])
+@bot.message_handler(commands=['give_me_naryad'])
 def give_me_NARYAD(message: Message):
     selected_entries.update({message.chat.id: []})
     markup = InlineKeyboardMarkup()
