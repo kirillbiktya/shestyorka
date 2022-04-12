@@ -27,19 +27,13 @@ bot = TeleBot(TELEGRAM_TOKEN)
 
 
 def check_user():
-    print('enter')
     def _wrapper(func):
-        print('enter 1')
         def __wrapper(*args, **kwargs):
-            print('enter 2')
             user_id = args[0].chat.id
 
             if len(list(filter(lambda x: x['telegram_id'] == user_id, user_list))) == 0:
-                print('not ok')
                 bot.send_message(user_id, 'Не зарегистрирован.')
                 return
-
-            print('ok')
 
             return func(*args, **kwargs)
 
