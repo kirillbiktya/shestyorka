@@ -123,7 +123,7 @@ def assignment_remove_all(user_id, message_id):
     selected_entries[user_id] = []
 
     bot.edit_message_text(text='Список очищен', chat_id=user_id, message_id=message_id, reply_markup=None)
-    sleep(2)
+    sleep(0.5)
     assignment_start(user_id, message_id)
 
 
