@@ -1,0 +1,19 @@
+[Unit]
+Description=shestyorka Telegram Bot
+OnFailure=sg_client_notify_failure@%i.service
+[Service]
+Type=simple
+WorkingDirectory=/home/kirill/shestyorka
+User=kirill
+Group=kirill
+ExecStart=/bin/bash python -m shestyorka
+ExecStartPost=-/bin/bash /home/kirill/sg_client/notify.sh start shestyorka
+ExecStopPost=-/bin/bash /home/kirill/sg_client/notify.sh stop shestyorka
+Restart=no
+# RestartSec=3
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=shestyorka_bot
+KillSignal=SIGINT
+[Install]
+WantedBy=multi-user.target

@@ -32,6 +32,8 @@ def construct_inline_keyboard_with_categories():
 
     kb.add(*row)
 
+    kb.add(InlineKeyboardButton(text='Отмена', callback_data='cat_kb.cancel'))
+
     return kb
 
 
@@ -54,11 +56,17 @@ def construct_inline_keyboard_with_districts(selected_category):
 
     kb.add(*row)
 
+    kb.add(InlineKeyboardButton(text='Отмена', callback_data='district.cancel'))
+
     return kb
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('cat_kb'))
 def cat_kb_callback(call: CallbackQuery):
+    if call.data == 'cat_kb.cancel':
+        assignment_start(call.from_user.id, call.message.id)
+        return
+
     selected_category = call.data.split('.')[1]
 
     markup = construct_inline_keyboard_with_districts(selected_category)
@@ -73,6 +81,10 @@ def cat_kb_callback(call: CallbackQuery):
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('district'))
 def district_callback(call: CallbackQuery):
+    if call.data == 'district.cancel':
+        assignment_start(call.from_user.id, call.message.id)
+        return
+
     selected_category = call.data.split('.')[1]
     selected_district = call.data.split('.')[2]
 
@@ -171,8 +183,8 @@ def assignment_callback(call: CallbackQuery):
         return
 
 
-@check_user()
 @bot.message_handler(commands=['start'])
+@check_user()
 def start(message: Message):
     bot.send_message(
         message.chat.id,
@@ -181,8 +193,8 @@ def start(message: Message):
     return
 
 
-@check_user()
 @bot.message_handler(commands=['give_me_naryad'])
+@check_user()
 def give_me_NARYAD(message: Message):
     selected_entries.update({message.chat.id: []})
     markup = InlineKeyboardMarkup()
@@ -192,4 +204,7 @@ def give_me_NARYAD(message: Message):
 
 
 if __name__ == "__main__":
-    bot.polling()
+    try:
+        bot.polling()
+    except Exception as e:
+        print(e)
