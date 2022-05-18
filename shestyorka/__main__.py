@@ -3,7 +3,7 @@ from telebot.types import CallbackQuery, Message, InlineKeyboardMarkup, InlineKe
 from time import sleep
 from shestyorka.assignment import Assignment
 from datetime import datetime
-
+import traceback
 
 # регистрация по заявке, вручную
 # /give_me_NARYAD -> список выбранных, предложение добавить -> выбор категории -> выбор рэса -> |
@@ -11,6 +11,10 @@ from datetime import datetime
 #                                     |----------------------------------------------------------
 
 selected_entries = {}  # {#user_id#: [{'name': #name#, 'district': #district#}]}
+
+
+def prepare_list(user_id: int):
+    selected_entries.update({user_id: []})
 
 
 def construct_inline_keyboard_with_categories():
@@ -81,23 +85,29 @@ def cat_kb_callback(call: CallbackQuery):
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('district'))
 def district_callback(call: CallbackQuery):
-    if call.data == 'district.cancel':
+    try:
+        if call.data == 'district.cancel':
+            assignment_start(call.from_user.id, call.message.id)
+            return
+
+        selected_category = call.data.split('.')[1]
+        selected_district = call.data.split('.')[2]
+
+        category_name = list(
+            filter(
+                lambda x: x['telegram_keyboard_data'] == selected_category, street_categories
+            )
+        )[0]['name']
+
+        selected_entries[call.from_user.id].append({'name': category_name, 'district': selected_district})
+
         assignment_start(call.from_user.id, call.message.id)
         return
-
-    selected_category = call.data.split('.')[1]
-    selected_district = call.data.split('.')[2]
-
-    category_name = list(
-        filter(
-            lambda x: x['telegram_keyboard_data'] == selected_category, street_categories
-        )
-    )[0]['name']
-
-    selected_entries[call.from_user.id].append({'name': category_name, 'district': selected_district})
-
-    assignment_start(call.from_user.id, call.message.id)
-    return
+    except KeyError:
+        prepare_list(call.from_user.id)
+        assignment_start(call.from_user.id, call.message.id)
+        bot.answer_callback_query(call.id, text='Снова Гречка дотыкался по кнопкам, начинаем заново...')
+        return
 
 
 def assignment_start(user_id, message_id):
@@ -156,7 +166,7 @@ def assignment_create(user_id, message_id):
             message_id=message_id,
             reply_markup=None
         )
-    caption = 'Нажми на текст внизу, что бы скопировать:\n<pre>' ''.join(filename.split('.')[:-1]) + '</pre>'
+    caption = 'Нажми на текст внизу, что бы скопировать:\n<pre>' + '.'.join(filename.split('.')[:-1]) + '</pre>'
     bot.send_document(
         chat_id=user_id,
         document=open(filename, 'rb'),
@@ -188,7 +198,7 @@ def assignment_callback(call: CallbackQuery):
             bot.answer_callback_query(call.id, text='Работаю на этим...')
             return
     except KeyError:
-        selected_entries.update({call.from_user.id: []})
+        prepare_list(call.from_user.id)
         assignment_start(call.from_user.id, call.message.id)
         bot.answer_callback_query(call.id, text='Снова Гречка дотыкался по кнопкам, начинаем заново...')
         return
@@ -198,7 +208,7 @@ def assignment_callback(call: CallbackQuery):
 @check_user()
 def start(message: Message):
     bot.send_message(
-        message.chat.id,
+        message.from_user.id,
         'Ну привет. Что бы получить наряд - жми /give_me_naryad. Больше ничего я пока не умею.'
     )
     return
@@ -207,14 +217,15 @@ def start(message: Message):
 @bot.message_handler(commands=['give_me_naryad'])
 @check_user()
 def give_me_NARYAD(message: Message):
+    prepare_list(message.from_user.id)
     markup = InlineKeyboardMarkup()
     markup.add(InlineKeyboardButton('ХОЧУ, ДАЙ', callback_data='assignment.start'))
-    bot.send_message(message.chat.id, 'Хочешь наряд?', reply_markup=markup)
+    bot.send_message(message.from_user.id, 'Хочешь наряд?', reply_markup=markup)
     return
 
 
 if __name__ == "__main__":
     try:
-        bot.polling()
+        bot.polling(skip_pending=True)
     except Exception as e:
-        print(e)
+        print(traceback.format_exc())
