@@ -172,15 +172,15 @@ def assignment_create(user_id, message_id):
 def assignment_callback(call: CallbackQuery):
     if call.data == 'assignment.start':
         assignment_start(call.from_user.id, call.message.id)
-        bot.answer_callback_query(call.id, text='Работаю на этим...')
+        bot.answer_callback_query(call.id)
         return
     elif call.data == 'assignment.add_category':
         assignment_add_category(call.from_user.id, call.message.id)
-        bot.answer_callback_query(call.id, text='Работаю на этим...')
+        bot.answer_callback_query(call.id)
         return
     elif call.data == 'assignment.remove_all':
         assignment_remove_all(call.from_user.id, call.message.id)
-        bot.answer_callback_query(call.id, text='Работаю на этим...')
+        bot.answer_callback_query(call.id)
         return
     elif call.data == 'assignment.create':
         assignment_create(call.from_user.id, call.message.id)
