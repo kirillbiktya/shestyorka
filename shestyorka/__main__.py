@@ -151,18 +151,19 @@ def assignment_create(user_id, message_id):
         )
     else:
         bot.edit_message_text(
-            text='Да на, заебешь',
+            text='Твой наряд-задание ⬇️',
             chat_id=user_id,
             message_id=message_id,
             reply_markup=None
         )
-
+    caption = 'Нажми на текст внизу, что бы скопировать:\n<pre>' ''.join(filename.split('.')[:-1]) + '</pre>'
     bot.send_document(
         chat_id=user_id,
         document=open(filename, 'rb'),
-        caption=filename,
+        caption=caption,
         visible_file_name=filename,
-        disable_content_type_detection=True
+        disable_content_type_detection=True,
+        parse_mode='html'
     )
     return
 
@@ -171,15 +172,19 @@ def assignment_create(user_id, message_id):
 def assignment_callback(call: CallbackQuery):
     if call.data == 'assignment.start':
         assignment_start(call.from_user.id, call.message.id)
+        bot.answer_callback_query(call.id, text='Работаю на этим...')
         return
     elif call.data == 'assignment.add_category':
         assignment_add_category(call.from_user.id, call.message.id)
+        bot.answer_callback_query(call.id, text='Работаю на этим...')
         return
     elif call.data == 'assignment.remove_all':
         assignment_remove_all(call.from_user.id, call.message.id)
+        bot.answer_callback_query(call.id, text='Работаю на этим...')
         return
     elif call.data == 'assignment.create':
         assignment_create(call.from_user.id, call.message.id)
+        bot.answer_callback_query(call.id, text='Работаю на этим...')
         return
 
 
@@ -207,4 +212,5 @@ if __name__ == "__main__":
     try:
         bot.polling()
     except Exception as e:
-        print(e)
+        print(str(e))
+        print(e.args)

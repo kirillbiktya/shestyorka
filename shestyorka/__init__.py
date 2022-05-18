@@ -17,7 +17,8 @@ street_categories = [
     {'telegram_chat_name': 'Спец1', 'name': 'Спец. маршрут 1', 'telegram_keyboard_data': 'spec1'},
     {'telegram_chat_name': 'Спец2', 'name': 'Спец. маршрут 2', 'telegram_keyboard_data': 'spec2'},
     {'telegram_chat_name': 'ЛО', 'name': 'Ландшафтное освещение', 'telegram_keyboard_data': 'lo'},
-    {'telegram_chat_name': 'Спец.ЛО', 'name': 'Спец. маршрут ЛО', 'telegram_keyboard_data': 'spec_lo'}
+    {'telegram_chat_name': 'Спец.ЛО', 'name': 'Спец. маршрут ЛО', 'telegram_keyboard_data': 'spec_lo'},
+    {'telegram_chat_name': 'АХП Развязки', 'name': 'АХП Развязки МКАД', 'telegram_keyboard_data': 'ahp_mkad'}
 ]
 districts = [
     'САО', 'СВАО', 'ВАО', 'ЮВАО', 'ЮАО', 'ЮЗАО', 'ЗАО', 'СЗАО', 'ЦАО', 'ТиНАО'
