@@ -170,21 +170,27 @@ def assignment_create(user_id, message_id):
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('assignment'))
 def assignment_callback(call: CallbackQuery):
-    if call.data == 'assignment.start':
+    try:
+        if call.data == 'assignment.start':
+            assignment_start(call.from_user.id, call.message.id)
+            bot.answer_callback_query(call.id)
+            return
+        elif call.data == 'assignment.add_category':
+            assignment_add_category(call.from_user.id, call.message.id)
+            bot.answer_callback_query(call.id)
+            return
+        elif call.data == 'assignment.remove_all':
+            assignment_remove_all(call.from_user.id, call.message.id)
+            bot.answer_callback_query(call.id)
+            return
+        elif call.data == 'assignment.create':
+            assignment_create(call.from_user.id, call.message.id)
+            bot.answer_callback_query(call.id, text='Работаю на этим...')
+            return
+    except KeyError:
+        selected_entries.update({call.from_user.id: []})
         assignment_start(call.from_user.id, call.message.id)
-        bot.answer_callback_query(call.id)
-        return
-    elif call.data == 'assignment.add_category':
-        assignment_add_category(call.from_user.id, call.message.id)
-        bot.answer_callback_query(call.id)
-        return
-    elif call.data == 'assignment.remove_all':
-        assignment_remove_all(call.from_user.id, call.message.id)
-        bot.answer_callback_query(call.id)
-        return
-    elif call.data == 'assignment.create':
-        assignment_create(call.from_user.id, call.message.id)
-        bot.answer_callback_query(call.id, text='Работаю на этим...')
+        bot.answer_callback_query(call.id, text='Снова Гречка дотыкался по кнопкам, начинаем заново...')
         return
 
 
@@ -201,7 +207,6 @@ def start(message: Message):
 @bot.message_handler(commands=['give_me_naryad'])
 @check_user()
 def give_me_NARYAD(message: Message):
-    selected_entries.update({message.chat.id: []})
     markup = InlineKeyboardMarkup()
     markup.add(InlineKeyboardButton('ХОЧУ, ДАЙ', callback_data='assignment.start'))
     bot.send_message(message.chat.id, 'Хочешь наряд?', reply_markup=markup)
@@ -212,5 +217,4 @@ if __name__ == "__main__":
     try:
         bot.polling()
     except Exception as e:
-        print(str(e))
-        print(e.args)
+        print(e)
