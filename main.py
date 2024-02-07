@@ -1,0 +1,1 @@
+from shestyorka import app

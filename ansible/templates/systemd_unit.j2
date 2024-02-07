@@ -1,0 +1,16 @@
+[Unit]
+Description=shestyorka Telegram bot
+[Service]
+Type=simple
+WorkingDirectory={{ ansible_env.HOME }}/shestyorka
+User={{ ansible_user_id }}
+Group={{ ansible_user_id }}
+ExecStart=/bin/bash -c "source venv/bin/activate && gunicorn main:app"
+Restart=no
+# RestartSec=3
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=shestyorka
+KillSignal=SIGINT
+[Install]
+WantedBy=multi-user.target
